@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hold Shift to Check Multiple Checkboxes</title>
+  <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+</head>
+<body>
+  <style>
+
+    html {
+      font-family: 'Oswald', sans-serif;
+      background:#ffc600;
+    }
+    
+    .content{
+      display: flex;
+      flex-direction: row;
+    }
+
+    .settingbox{
+      font-family: 'Oswald', sans-serif;
+      min-width: 31%;
+      flex:0 0 30%;
+      box-sizing: border-box;
+      padding-left: 80px;
+      display: flex;
+      flex-flow: column wrap;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    .settingbox .newitem{
+      font-size: 90px;
+      margin-bottom:50px; 
+    }
+
+    .settingbox .addinput{
+      display: flex;
+      justify-content:center;
+      align-items: center;
+      height: 50px;
+    }
+    .settingbox input{
+      height: 50px;
+      width: 250px;
+      font-size: 20px;
+      border-radius: 5px;
+      box-shadow:10px 10px 0 rgba(0,0,0,0.1);
+    }
+
+
+    .inbox {
+      min-width:550px;
+      max-width:800px;
+      max-height: 703px;
+      margin:50px;
+      flex:1 1 70%;
+      background:white;
+      border-radius:5px;
+      box-shadow:10px 10px 0 rgba(0,0,0,0.1);
+      overflow: auto;
+    }
+
+    .item {
+      display:flex;
+      align-items:center;
+      border-bottom: 1px solid #F1F1F1;
+    }
+
+    .item:last-child {
+      border-bottom:0;
+    }
+
+
+    input:checked + p {
+      background:#e8ebeb;
+      text-decoration: line-through;
+    }
+
+    input[type="checkbox"] {
+      margin:20px;
+    }
+
+    p {
+      margin:0;
+      padding:20px;
+      transition:background 0.2s;
+      flex:1;
+      font-family:'helvetica neue';
+      font-size: 20px;
+      font-weight: 200;
+      border-left: 1px solid #D1E2FF;
+    }
+
+    .clear {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items:center;
+      padding: 0px 50px;
+
+    }
+    img{
+      width: 45px;
+      height: 45px;
+      margin: 5px 10px;
+      cursor:pointer;
+    }
+    img:hover{
+      width: 50px;
+      height: 50px;
+    }
+  </style>
+   <!--
+   The following is a common layout you would see in an email client.
+
+   When a user clicks a checkbox, holds Shift, and then clicks another checkbox a few rows down, all the checkboxes inbetween those two checkboxes should be checked.
+
+  -->
+  <div class="content">
+    <div class="settingbox">
+      <span class="newitem">New Item</span>
+      <div class="addinput">
+        <input type="text" placeholder="Something you have to do" class="NEW" value="" >
+        <img src="./plus.png" alt="">
+      </div>
+    </div>
+
+    <div class="todolist">
+      <div class="inbox" id="ib" >
+        <div class="item">
+          <input type="checkbox">
+          <p>This is an inbox layout.</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Check one item</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Hold down your Shift key</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Check a lower item</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Everything inbetween should also be set to checked</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Try do it without any libraries</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Just regular JavaScript</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Good Luck!</p>
+        </div>
+        <div class="item">
+          <input type="checkbox">
+          <p>Don't forget to tweet your result!</p>
+        </div>
+      </div>
+      <!-- Clear finish things -->
+      <div class="clear">
+          <h1>Clear</h1>
+          <img src="./delete.png" alt="">
+      </div>
+    </div>
+</div>
+  
+<script>
+  const inbox= document.querySelector('.inbox')
+  const addbutton = document.querySelector('.addinput img');
+  const add = addbutton.addEventListener('click',pushonlist);
+
+// note : 新增項目
+  const qsnewitem = document.querySelector('.content .NEW');
+  function pushonlist(){
+    let newitem = qsnewitem.value;
+    if(newitem==="")return;
+    else{
+      let html = inbox.innerHTML + 
+      `
+      <div class="item">
+        <input type="checkbox">
+        <p>${newitem}</p>
+      </div>
+      `;
+      inbox.innerHTML = html;
+      }
+    }
+
+// note: 刪除項目
+  const qsdelet = document.querySelector('.clear img');
+  let qsinbox = document.getElementById('ib');
+  qsdelet.addEventListener('click',clearfinishitem);
+  function clearfinishitem(){ 
+    console.log(qsinbox.childNodes);
+    checkboxes.forEach(checkbox => {
+      if(checkbox.checked){
+          qsinbox.removeChild(checkbox.parentNode);
+      }
+    });
+  }
+
+
+  const checkboxes = document.querySelectorAll('.inbox input[type="checkbox"]');  // all checkbox
+  let lastchecked;
+  function handlecheck(e){
+    let inBetween = false;
+    if(e.shiftKey &&  this.checked){
+      checkboxes.forEach(checkbox => {
+        if(checkbox===this || checkbox === lastchecked){
+          inBetween = !inBetween;
+        }
+        if(inBetween){
+          checkbox.checked = true;
+        }
+      })
+    }
+    lastchecked = this;
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('click', handlecheck)
+    });
+  
+
+</script>
+</body>
+</html>
+
+
+<!--  
+  BUG
+  1.只能刪除第一次，接下來會出錯
+  2.一旦新增項目，shift功能會失效 
+-->
